@@ -56,18 +56,20 @@ def q_learning_with_function_approximation(df,
                                            discount_factor=0.98,
                                            learning_rate=0.001,
                                            train_test_split=0.8,
+                                           sharpe_multiplier=252,
+                                           ma_window_size=20,
+                                           initial_balance=10000,
+                                           epsilon=0.2,
+                                           num_epochs=100,
+                                           num_features=6,
                                            ):
-    ma_window_size = 20
-    initial_balance = 10000
-    epsilon = 0.2
-    num_epochs = 100
 
     df["moving_avg"] = df["Close"].rolling(window=ma_window_size).mean()
     prices = df["Close"].values
     moving_avg = df["moving_avg"].values
     ma_daily = df["Close"].rolling(window=1).mean().values
     ma_weekly = df["Close"].rolling(window=5).mean().values
-    ma_monthly = df["Close"].rolling(window=20).mean().values
+    ma_monthly = df["Close"].rolling(window=21).mean().values
     volume = df["Volume"].values
 
     # since the first (ma_window_size - 1) moving averages are nan
@@ -86,7 +88,6 @@ def q_learning_with_function_approximation(df,
     ma_weekly, test_ma_weekly = ma_weekly[:int(train_test_split * len(ma_weekly))], ma_weekly[int(train_test_split * len(ma_weekly)):]
     ma_monthly, test_ma_monthly = ma_monthly[:int(train_test_split * len(ma_monthly))], ma_monthly[int(train_test_split * len(ma_monthly)):]
 
-    num_features = 6
     theta = np.random.normal(0, 1, num_features + 1)
 
     t = 0
@@ -133,7 +134,6 @@ def q_learning_with_function_approximation(df,
     # Generate a policy using this estimate q-value
 
     total_reward = 0
-    initial_balance = 10000
     #curr_state = [0, test_prices[0], test_moving_avg[0], initial_balance]
     #curr_state = [0, test_prices[0], initial_balance]
     curr_state = [0, test_prices[0], test_ma_daily[0], test_ma_weekly[0], test_ma_monthly[0],
@@ -171,7 +171,7 @@ def q_learning_with_function_approximation(df,
     print("final valuation: {}, initial valuation: {}".format(valuation(curr_state), initial_balance))
     valuations_diff = np.array(valuations_diff)
     sharpe_ratio = valuations_diff.mean() / valuations_diff.std()
-    annual_sharpe = sharpe_ratio * np.sqrt(365)
+    annual_sharpe = sharpe_ratio * np.sqrt(sharpe_multiplier)
     print("sharpe ratio = {}, annualized sharpe ratio = {}".format(sharpe_ratio, annual_sharpe))
 
     return sharpe_ratio, annual_sharpe
