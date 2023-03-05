@@ -9,7 +9,7 @@ def random_timeseries(initial_value, volatility, num_time_steps):
     return ts
 
 num_steps = 100
-prices = random_timeseries(1.2, 0.15, num_steps)
+prices = random_timeseries(5, 0.15, num_steps)
 time_steps = range(num_steps)
 
 

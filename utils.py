@@ -43,14 +43,17 @@ def simulate_data_from_series(df, num_states_price=100):
             prob_sell = np.random.rand()
             if prob_sell < 0.5:
                 action = "sell"
-                reward = prices[i] - holding_price
+                reward = prices[i] - holding_price - 0.01 * prices[i]
+                balance += reward
                 holding = 0
         else:
-            prob_buy = np.random.rand()
-            if prob_buy < 0.5:
-                action = "buy"
-                holding = 1
-                holding_price = prices[i]
+            if prices[i] < balance:
+                prob_buy = np.random.rand()
+                if prob_buy < 0.5:
+                    action = "buy"
+                    holding = 1
+                    holding_price = prices[i]
+                    balance -= (prices[i] + 0.01 * prices[i])
         action = action_mapping(action)
         markov_chain.append([int(state_curr), int(action), reward, int(state_next)])
         state_curr = state_next
