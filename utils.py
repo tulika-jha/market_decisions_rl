@@ -30,7 +30,6 @@ def simulate_data_from_series(df, num_states_price=100):
     balance = 5
     holding = 0 # holding = 1 when you have bought a share and haven't sold it yet
     holding_price = None
-    actions = ["buy","sell","hold"]
 
     markov_chain = []
     state_curr = states_mapping(prices[0], moving_avg[0])
